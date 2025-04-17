@@ -1,3 +1,4 @@
+
 # Task 7: Basic Sales Summary from SQLite using Python
 
 This project is part of the **Data Analyst Internship** (Elevate Labs). It demonstrates how to:
@@ -24,82 +25,130 @@ This project is part of the **Data Analyst Internship** (Elevate Labs). It demon
 - Optional: Jupyter Notebook or any code editor
 
 
-##  Dataset Description
+## Dataset Description
 
 We'll create a database named `sales_data.db` with one table: `sales`.
 
-## Bar char picture: 
-"sales_chart_pretty.png"
-
-## Table Schema
+### Table Schema
 ```sql
 CREATE TABLE sales (
   product TEXT,
   quantity INTEGER,
   price REAL
 );
-## Taken Data in sql:
+```
 
-product | quantity | price
-Product A | 10 | 20.0
-Product B | 5 | 50.0
-Product A | 7 | 20.0
-Product C | 3 | 70.0
-Product B | 4 | 50.0
-Product C | 6 | 70.0
+### Sample Data
+| product   | quantity | price |
+|-----------|----------|-------|
+| Product A | 10       | 20.0  |
+| Product B | 5        | 50.0  |
+| Product A | 7        | 20.0  |
+| Product C | 3        | 70.0  |
+| Product B | 4        | 50.0  |
+| Product C | 6        | 70.0  |
 
-Steps to Run the Project
-1. Create and Populate the SQLite Database
-Use the sqlite3 module in Python to:
+---
 
-Create the database file
+## 🚀 Full Process (Code Included)
 
-Create a sales table
+python
+# Import libraries
+import sqlite3
+import pandas as pd
+import matplotlib.pyplot as plt
 
-Insert sample data (products, quantities, and prices)
+# Step 1: Create the database and insert sample data
+conn = sqlite3.connect('sales_data.db')
+cursor = conn.cursor()
 
-2. Query and Analyze the Data
-Run SQL to summarize the data:
+# Create table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS sales (
+        product TEXT,
+        quantity INTEGER,
+        price REAL
+    )
+''')
 
-sql
-Copy
-Edit
-SELECT product, 
-       SUM(quantity) AS total_qty, 
+# Sample data
+sales_data = [
+    ('Product A', 10, 20.0),
+    ('Product B', 5, 50.0),
+    ('Product A', 7, 20.0),
+    ('Product C', 3, 70.0),
+    ('Product B', 4, 50.0),
+    ('Product C', 6, 70.0)
+]
+
+# Insert data
+cursor.executemany('INSERT INTO sales (product, quantity, price) VALUES (?, ?, ?)', sales_data)
+conn.commit()
+
+# Step 2: Write SQL query to summarize data
+query = '''
+SELECT product,
+       SUM(quantity) AS total_qty,
        SUM(quantity * price) AS revenue
 FROM sales
-GROUP BY product;
-3. Load Data into Pandas and Visualize
-Use pandas.read_sql_query() to load results
+GROUP BY product
+'''
 
-Print the summary table
+# Step 3: Load data into pandas
+df = pd.read_sql_query(query, conn)
 
-Use matplotlib to plot a bar chart:
+# Step 4: Print summary
+print("Sales Summary:\n")
+print(df)
 
-X-axis: Product
+# Step 5: Plot bar chart
+df.plot(kind='bar', x='product', y='revenue', legend=False, color='skyblue')
+plt.title('Revenue by Product')
+plt.xlabel('Product')
+plt.ylabel('Revenue')
+plt.tight_layout()
+plt.savefig('sales_chart.png')  # Save chart
+plt.show()
 
-Y-axis: Revenue
+# Step 6: Close connection
+conn.close()
+```
 
-Save the chart as sales_chart.png
 
-## Sample Output
-Printed DataFrame:
-mathematica
-Copy
-Edit
+
+## Expected Output
+
+###  Printed Output
+```
     product  total_qty  revenue
 0  Product A         17    340.0
 1  Product B          9    450.0
 2  Product C          9    630.0
-Bar Chart:
-A bar graph showing revenue by product, saved as sales_chart.png
+```
+
+### Chart
+- A bar chart saved as **sales_chart.png** showing revenue per product.
 
 
-## Final Outcome
+## Requirements
 
-Database created with sales data.
-SQL query calculates total quantity and revenue by product.
-Results printed in the console.
-Bar chart of revenue per product is generated and saved.
+Install required packages if not already installed:
+```bash
+pip install pandas matplotlib
+```
 
+
+## Learning Outcomes
+
+- Learn basic SQL queries
+- Practice importing SQL data into Python
+- Perform data summarization
+- Create your first sales chart using Matplotlib
+
+
+## Files Generated
+
+- `sales_data.db`: SQLite database
+- `sales_chart.png`: Revenue chart
+- This `README.md` file
 
